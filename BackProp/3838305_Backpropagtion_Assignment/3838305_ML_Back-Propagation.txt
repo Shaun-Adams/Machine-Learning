@@ -1,0 +1,101 @@
+﻿SI Adams - 3838305
+CSC311 - Machine Learning
+Neural Networks 
+
+Task 1:
+Back-Propagation Neural Network Algorithm:
+
+* Input x and network function F
+* The derivative of  F’(x) is computed by:
+   * Feed forward -
+      * input x is fed into the network
+      * the values are fed through the hidden layer nodes, 
+      * using those values from hidden layer we compute values of output layer, this is done by; 
+      * multiplying each row of input with each weighted column which results in the hidden neuron values.
+      * F = w(n) * X(n)
+      * Throw the result into the activation function
+      * activation function is computed as: 1 / (1 + e^(-z))
+      * The primitive functions at the nodes and their derivatives are evaluated at each node. 
+      * The derivatives are stored
+   * Backpropagation - 
+      * the predicted output is compared to the expected output, these values will not match
+      * We then minus the two values and this results in the error value this is called the back-prop error
+      * error = predict – output
+      * Error value is propagated from output layer to the hidden layer
+      * Gradient descent is used to update the weights by taking the derivative of the cost function over the derivative of the weights
+      * this is where learning rate gets introduced. The learning rate is the amount that the weights are updated during training 
+      * Weight += Error * Input  * (Output*(1-Output)), here Output (1-Output) is the derivative of activation function.
+      * OR Weight += learning rate * error * input
+      * new updated weight is minimizing the error function, this is called learning rate.
+* These steps are repeated until error values are extremely small and predicted output matches expected output.
+ 
+coloumn 6 refers to the classes that each row corresponds too. therefore, each value will be represented as either 0, 1 or 2 
+these values will then be used to compare the actual output to the predicted output 
+
+Task 2:
+Pseudo code
+
+Let X(1)…X(4) represent the node vector at each of the 4 layers.
+Let w(1), w(2) represent the weight vector between each layer
+
+Class NN:
+        Function sigmoid:
+                1 / (1 + e^(-z))
+
+        Function sig derive:
+                z * (1 - z)
+
+	Function Feed forward:
+		Set a(1) = X
+		Set F2 = [ w(1) * X(1) ];
+		Set a(2) = gf(F2)
+		Set F3 = [w(2) * X(2) ]
+
+        Function propagate error:
+		Set error^(L) = a^(L) – y
+
+        Function back propagation:
+                Set w(1) += x(1) * (2 * error * sigmoid_derive(output) * ( w(2) * sigmoid_derive(layer)))) 
+                Set w(2) += layer * (2 * error * sigmoid_derive(output)
+		#Can also be seen as:
+                {δ(i) = [w] error(i+1) ⊗ a^(i) ⊗ (1 - a^(i))}
+
+        Function train:
+                Set Output = call feed forward function
+                Call back propagation function
+
+Given a training set {(x(1), y(1)),…. (x(m), y(m))}
+
+For i = 1 to m
+        If i mod 100 == 0
+		Set a(1) = x(i)
+		Perform forward propagation to compute a^(layer) for l = 2,3,4..L
+		Using y^(i), compute error for the last layer, that is error^(layer) = a^(Layer) – y^(i)
+		Compute errors for the other layers as: error (i)^(layer) = error (i)^(layer) + a^(layer) * errori^(layer+1)
+
+
+Task 3
+
+Weights:
+* Neural network training is about finding weights that minimize prediction error. We usually start our training with a set of randomly generated weights.
+* weights associated with neuron connections must be updated after forward passes of data through the network
+* The error represents the difference between actual output and predicted output values
+* This error is required at neurons to make weight adjustments, and are propagated backward through the network after calculation of the backpropagation error. 
+* This is used to update the weights in an attempt to correctly map arbitrary inputs to outputs.
+* Gradient descent is used to more efficiently determine optimal weights by acting as a guide when searching for a cost function's optimal value
+* Stochastic gradient descent is a randomization of data sampling on which a single selection is used for error backpropagation (and weight updates)
+* Weight += learning rate * error * input
+* Error is the neuron delta weight update changes that are needed
+
+# Update network weights with error
+# takes in 3 args, network, row and learning rate
+def update_weights(network, row, l_rate):
+	for i in range(len(network)): 									# loops through length of network number of times
+		inputs = row[:-1] 									# sets input to all values in row except the last col in the row
+		if i != 0: 										# if i is not equal to 0 
+			inputs = [neuron['output'] for neuron in network[i - 1]] 
+		for neuron in network[i]: 								# loops through each element in network
+			for j in range(len(inputs)):  							# loops through length of input number of times
+				neuron['weights'][j] += l_rate * neuron['delta'] * inputs[j] 		# updating weights
+			neuron['weights'][-1] += l_rate * neuron['delta'] 				# updating weights
+
